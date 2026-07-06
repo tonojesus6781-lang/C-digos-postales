@@ -238,7 +238,76 @@ const ZONA = {
   etiquetaResto: "Nacional"              // tag verde
 };
 const MAX_SIN_SCROLL = 8;   // hasta cuántos resultados se muestran sin scroll
-const MUESTRAS_TRAMO = 7;   // portales sondeados por paridad al calcular tramos
+const MUESTRAS_TRAMO = 7;   // portales sondeados por paridad al calcular tramos (modo API)
+
+/* ---- Datos locales exactos (generados del GeoPackage del IGN) ---- */
+const TRAMOS_LOCAL_URL = "tramos-bizkaia.json";       // mismo repo que index.html
+const PROVINCIAS_LOCALES = ["bizkaia", "vizcaya"];
+let tramosLocalPromesa = null;                        // caché de la descarga
+
+function normaliza(s){
+  return (s || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .toUpperCase().replace(/[.,;:()\/-]/g, " ").replace(/\s+/g, " ").trim();
+}
+/* Tipos de vía (castellano y euskera) y palabras vacías: no forman parte del "núcleo" */
+const PALABRAS_TIPO = new Set(("CALLE KALEA AVENIDA AVDA ETORBIDEA PLAZA ENPARANTZA PLAZUELA " +
+  "BARRIO BARRIADA AUZOA AUZOTEGIA CAMINO BIDEA PASEO IBILBIDEA ALAMEDA ZUMARKALEA TRAVESIA " +
+  "ZEHARKALEA CARRETERA ERREPIDEA GRUPO TALDEA RONDA ERRONDA PASAJE GLORIETA URBANIZACION " +
+  "POLIGONO INDUSTRIALDEA ALDEA ESCALINATA PARTICULAR MUELLE KAIA PUENTE ZUBIA VIA PARQUE " +
+  "SUBIDA BAJADA ESTRADA SENDA ATZEKALEA ERRIBERA RIBERA").split(" "));
+const PALABRAS_VACIAS = new Set("DE DEL LA LAS EL LOS Y A AL ETA".split(" "));
+/* Familias de tipo equivalentes para desempatar */
+const FAMILIAS_TIPO = [["BARRIO","BARRIADA","AUZOA","AUZOTEGIA"],["CALLE","KALEA"],
+  ["AVENIDA","AVDA","ETORBIDEA"],["PLAZA","ENPARANTZA","PLAZUELA"],["CAMINO","BIDEA"],
+  ["PASEO","IBILBIDEA"],["ALAMEDA","ZUMARKALEA"],["TRAVESIA","ZEHARKALEA"],
+  ["CARRETERA","ERREPIDEA"],["GRUPO","TALDEA"],["POLIGONO","INDUSTRIALDEA"]];
+function familiaDe(palabra){
+  for (const f of FAMILIAS_TIPO) if (f.includes(palabra)) return f[0];
+  return palabra;
+}
+function separa(nombre){
+  const nucleo = [], tipos = [];
+  for (const p of normaliza(nombre).split(" ")){
+    if (PALABRAS_VACIAS.has(p)) continue;
+    (PALABRAS_TIPO.has(p) ? tipos : nucleo).push(p);
+  }
+  return { nucleo: nucleo.join(" "), tipos: new Set(tipos.map(familiaDe)) };
+}
+
+let indiceLocal = null;   // muni → [{clave, nucleo, tipos}]
+function cargaTramosLocal(){
+  if (!tramosLocalPromesa){
+    tramosLocalPromesa = fetch(TRAMOS_LOCAL_URL)
+      .then(r => r.ok ? r.json() : null)
+      .then(base => {
+        if (base && base.datos){
+          indiceLocal = {};
+          for (const clave of Object.keys(base.datos)){
+            const [muni, via] = clave.split("|");
+            const m = normaliza(muni);
+            (indiceLocal[m] = indiceLocal[m] || []).push({ clave, ...separa(via) });
+          }
+        }
+        return base;
+      })
+      .catch(() => null);
+  }
+  return tramosLocalPromesa;
+}
+async function tramosDeLocal(c){
+  const prov = (c.province || "").toLowerCase();
+  if (!PROVINCIAS_LOCALES.some(p => prov.includes(p))) return null;
+  const base = await cargaTramosLocal();
+  if (!base || !indiceLocal) return null;
+  const candidatas = indiceLocal[normaliza(c.muni)] || [];
+  const buscada = separa(nombreVia(c));
+  if (!buscada.nucleo) return null;
+  let porNucleo = candidatas.filter(v => v.nucleo === buscada.nucleo);
+  if (porNucleo.length > 1 && buscada.tipos.size)      // desempate por familia de tipo
+    porNucleo = porNucleo.filter(v => [...buscada.tipos].some(t => v.tipos.has(t)));
+  if (porNucleo.length !== 1) return null;             // ambiguo o inexistente → API
+  return { via: base.datos[porNucleo[0].clave], version: base.v };
+}
 
 /* =====================================================================
    1) CAPA DE RED — JSONP contra CartoCiudad (evita CORS sin backend)
@@ -609,7 +678,14 @@ async function eligeCandidato(c){
         muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
       }
       ponEstado("");
-      if (c.type === "callejero") compruebaMultiCP(c, d && d.postalCode);
+      if (c.type === "callejero"){
+        const local = await tramosDeLocal(c);
+        if (local){
+          pintaTramosLocal(c, local, d && d.postalCode);
+        } else {
+          compruebaMultiCP(c, d && d.postalCode);
+        }
+      }
     }
   } catch (_) {
     ponEstado("Error al obtener el detalle. Inténtalo de nuevo.", { error: true });
@@ -773,7 +849,28 @@ async function tramosParidad(c, paridad, token, puntosMapa = []){
   return tramos.filter(t => t.desde <= t.hasta);
 }
 
-function pintaTramos(impares, pares, puntosMapa = []){
+/* ---------- Tramos desde el dato local (exactos, sin llamadas a la API) ---------- */
+function pintaTramosLocal(c, local, cpVia){
+  // formato local: [desde, hasta, cp, lat1, lng1, lat2, lng2]
+  const convierte = (arr) => arr.map(t => ({ desde: t[0], hasta: t[1], cp: t[2] }));
+  const impares = convierte(local.via.i), pares = convierte(local.via.p);
+  const puntosMapa = [];
+  [...local.via.i, ...local.via.p].forEach(t => {
+    puntosMapa.push({ n: t[0], cp: t[2], lat: t[3], lng: t[4] });
+    if (t[1] !== t[0]) puntosMapa.push({ n: t[1], cp: t[2], lat: t[5], lng: t[6] });
+  });
+  const cps = new Set([...impares, ...pares].map(t => t.cp));
+  if (!cpVia && cps.size === 1){          // la API no dio CP de vía pero el local es único
+    const unico = [...cps][0];
+    pintaCP(unico);
+    cpNota.textContent = "Código postal exacto (dato local IGN " + local.version + ").";
+  }
+  tramosEl.hidden = false;
+  pintaTramos(impares, pares, puntosMapa,
+    `Dato local exacto por portal (CartoCiudad/IGN, edición ${local.version}).`);
+}
+
+function pintaTramos(impares, pares, puntosMapa = [], notaFuente = null){
   if (!impares.length && !pares.length){
     tramosEl.innerHTML = "<h3>Códigos por tramo</h3><div>Esta vía no tiene portales registrados en CartoCiudad.</div>";
     return;
@@ -790,9 +887,9 @@ function pintaTramos(impares, pares, puntosMapa = []){
   tramosEl.innerHTML =
     "<h3>Códigos y portales de esta vía</h3>" +
     `<table>${filas}</table>` +
-    `<div class="nota">${unico
+    `<div class="nota">${notaFuente || (unico
       ? "Todos los portales sondeados comparten código postal."
-      : "Cada color de la tabla coincide con los puntos del mapa. Tramos estimados por sondeo; fronteras afinadas por bisección. Para verificar un portal concreto, usa el comprobador."}</div>`;
+      : "Cada color de la tabla coincide con los puntos del mapa. Tramos estimados por sondeo; fronteras afinadas por bisección. Para verificar un portal concreto, usa el comprobador.")}</div>`;
 }
 
 /* ---------- Comprobador manual de portal ---------- */
@@ -846,5 +943,3 @@ else {
 </script>
 </body>
 </html>
-
-
