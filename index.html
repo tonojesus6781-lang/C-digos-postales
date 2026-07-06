@@ -11,64 +11,37 @@
 <style>
   /* ============ TOKENS ============ */
   :root{
-    --papel:#FBFAF6;        /* fondo, blanco papel */
-    --tinta:#1C1B18;        /* texto principal */
-    --tinta-suave:#6B675C;  /* texto secundario */
-    --linea:#E4E1D6;        /* bordes suaves */
-    --amarillo:#FFCC00;     /* acento Correos, uso puntual */
-    --azul:#14418B;         /* azul cartero, enlaces y estados */
-    --blanco:#FFFFFF;
+    --papel:#FBFAF6; --tinta:#1C1B18; --tinta-suave:#6B675C;
+    --linea:#E4E1D6; --amarillo:#FFCC00; --azul:#14418B; --blanco:#FFF;
+    --rojo:#C4342B; --verde:#1E7A46;
     --radio:14px;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
   body{
-    font-family:'Archivo',system-ui,sans-serif;
-    background:var(--papel);
-    color:var(--tinta);
-    line-height:1.5;
-    -webkit-font-smoothing:antialiased;
+    font-family:'Archivo',system-ui,sans-serif;background:var(--papel);
+    color:var(--tinta);line-height:1.5;-webkit-font-smoothing:antialiased;
   }
-  .contenedor{max-width:880px;margin:0 auto;padding:28px 20px 60px}
+  .contenedor{max-width:920px;margin:0 auto;padding:28px 20px 60px}
 
   /* ============ CABECERA ============ */
-  header{margin-bottom:26px}
-  .franja{
-    display:inline-block;background:var(--amarillo);
-    padding:2px 10px;border-radius:4px;
-    font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;
-  }
-  h1{
-    font-weight:900;font-stretch:112%;
-    font-size:clamp(26px,5vw,38px);
-    letter-spacing:-.01em;margin-top:10px;
-  }
+  header{margin-bottom:22px}
+  .franja{display:inline-block;background:var(--amarillo);padding:2px 10px;border-radius:4px;
+    font-size:12px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+  h1{font-weight:900;font-stretch:112%;font-size:clamp(26px,5vw,38px);letter-spacing:-.01em;margin-top:10px}
   header p{color:var(--tinta-suave);font-size:15px;max-width:56ch;margin-top:4px}
 
   /* ============ BUSCADOR ============ */
   .caja-busqueda{position:relative}
-  .campo{
-    display:flex;align-items:center;gap:8px;
-    background:var(--blanco);
-    border:1.5px solid var(--tinta);
-    border-radius:var(--radio);
-    padding:6px 6px 6px 18px;
-    box-shadow:0 2px 0 var(--tinta);
-    transition:box-shadow .15s ease;
-  }
+  .campo{display:flex;align-items:center;gap:8px;background:var(--blanco);
+    border:1.5px solid var(--tinta);border-radius:var(--radio);
+    padding:6px 6px 6px 18px;box-shadow:0 2px 0 var(--tinta);transition:box-shadow .15s}
   .campo:focus-within{box-shadow:0 4px 0 var(--amarillo)}
-  .campo input{
-    flex:1;min-width:0;border:0;outline:0;background:transparent;
-    font:inherit;font-size:17px;padding:10px 0;color:var(--tinta);
-  }
+  .campo input{flex:1;min-width:0;border:0;outline:0;background:transparent;
+    font:inherit;font-size:17px;padding:10px 0;color:var(--tinta)}
   .campo input::placeholder{color:#A6A294}
-  .boton{
-    border:0;cursor:pointer;border-radius:10px;
-    display:flex;align-items:center;justify-content:center;
-    width:46px;height:46px;flex-shrink:0;
-    background:transparent;color:var(--tinta);
-    transition:background .15s ease,transform .1s ease;
-  }
+  .boton{border:0;cursor:pointer;border-radius:10px;display:flex;align-items:center;
+    justify-content:center;width:46px;height:46px;flex-shrink:0;background:transparent;
+    color:var(--tinta);transition:background .15s,transform .1s}
   .boton:hover{background:#F2EFE5}
   .boton:active{transform:scale(.94)}
   .boton:focus-visible{outline:2px solid var(--azul);outline-offset:2px}
@@ -76,40 +49,46 @@
   #btnBuscar{background:var(--tinta);color:var(--amarillo)}
   #btnBuscar:hover{background:#000}
   #btnMic.escuchando{background:var(--amarillo);color:var(--tinta);animation:pulso 1.1s infinite}
-  @keyframes pulso{
-    0%{box-shadow:0 0 0 0 rgba(255,204,0,.55)}
-    70%{box-shadow:0 0 0 14px rgba(255,204,0,0)}
-    100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}
-  }
+  @keyframes pulso{0%{box-shadow:0 0 0 0 rgba(255,204,0,.55)}
+    70%{box-shadow:0 0 0 14px rgba(255,204,0,0)}100%{box-shadow:0 0 0 0 rgba(255,204,0,0)}}
+
+  /* Barra de ubicación */
+  .barra-geo{display:flex;align-items:center;gap:12px;margin-top:10px;flex-wrap:wrap}
+  #btnGeo{display:inline-flex;align-items:center;gap:7px;border:1.5px solid var(--tinta);
+    background:var(--blanco);border-radius:99px;padding:7px 14px;font:inherit;
+    font-size:13.5px;font-weight:700;cursor:pointer;transition:background .15s}
+  #btnGeo:hover{background:#F2EFE5}
+  #btnGeo.activo{background:var(--amarillo);border-color:var(--tinta)}
+  #btnGeo svg{width:16px;height:16px}
+  #geoInfo{font-size:13px;color:var(--tinta-suave)}
   .ayuda{margin-top:8px;font-size:13px;color:var(--tinta-suave)}
   .ayuda b{color:var(--tinta);font-weight:700}
 
   /* ============ LISTA DE CANDIDATOS ============ */
-  .lista{
-    position:absolute;z-index:1100;left:0;right:0;top:calc(100% + 8px);
-    background:var(--blanco);border:1.5px solid var(--tinta);
-    border-radius:var(--radio);overflow:hidden;
-    box-shadow:0 8px 24px rgba(28,27,24,.14);
-    max-height:340px;overflow-y:auto;
-  }
-  .lista button{
-    display:block;width:100%;text-align:left;
-    border:0;background:transparent;cursor:pointer;
-    padding:12px 16px;font:inherit;
-    border-bottom:1px solid var(--linea);
-  }
+  .lista{position:absolute;z-index:1100;left:0;right:0;top:calc(100% + 8px);
+    background:var(--blanco);border:1.5px solid var(--tinta);border-radius:var(--radio);
+    overflow:hidden;box-shadow:0 8px 24px rgba(28,27,24,.14)}
+  .lista.con-scroll{max-height:420px;overflow-y:auto}
+  .lista button{display:block;width:100%;text-align:left;border:0;background:transparent;
+    cursor:pointer;padding:11px 16px;font:inherit;border-bottom:1px solid var(--linea)}
   .lista button:last-child{border-bottom:0}
   .lista button:hover,.lista button:focus-visible{background:#FFF7D6;outline:none}
   .lista .via{font-weight:700}
+  .lista button.es-poblacion .via{font-size:17px;font-weight:800}
   .lista .lugar{font-size:13px;color:var(--tinta-suave);margin-top:1px}
-  .etiqueta{
-    display:inline-block;font-size:10.5px;font-weight:800;
-    letter-spacing:.08em;text-transform:uppercase;
-    padding:1px 7px;border-radius:99px;margin-left:8px;vertical-align:2px;
-    background:#EEF3FB;color:var(--azul);
-  }
+  .lista .dist{font-weight:700;color:var(--azul)}
 
-  /* ============ ESTADOS / MENSAJES ============ */
+  /* Tags */
+  .tag{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.08em;
+    text-transform:uppercase;padding:2px 8px;border-radius:99px;margin-left:8px;
+    vertical-align:2px;color:var(--blanco)}
+  .tag.zona-rojo{background:var(--rojo)}
+  .tag.zona-azul{background:var(--azul)}
+  .tag.zona-verde{background:var(--verde)}
+  .tag.tipo{background:transparent;color:var(--tinta);border:1.5px solid var(--tinta)}
+  .tag.tipo-pob{background:var(--tinta);color:var(--amarillo);border:1.5px solid var(--tinta)}
+
+  /* ============ ESTADOS ============ */
   #estado{margin-top:18px;font-size:14.5px;color:var(--tinta-suave);min-height:22px}
   #estado.error{color:#A33B2E;font-weight:600}
   .cargando::after{content:'…';animation:puntos 1s steps(3) infinite}
@@ -117,69 +96,57 @@
 
   /* ============ RESULTADO ============ */
   #resultado{display:none;margin-top:22px}
-  #resultado.visible{display:grid;grid-template-columns:minmax(280px,1fr) 1.2fr;gap:18px}
-  @media(max-width:720px){#resultado.visible{grid-template-columns:1fr}}
+  #resultado.visible{display:grid;grid-template-columns:minmax(300px,1fr) 1.2fr;gap:18px}
+  @media(max-width:740px){#resultado.visible{grid-template-columns:1fr}}
+  .tarjeta{background:var(--blanco);border:1.5px solid var(--tinta);
+    border-radius:var(--radio);padding:22px}
+  .titulo-via{font-weight:800;font-size:19px;line-height:1.25}
+  .sub-lugar{color:var(--tinta-suave);font-size:14.5px;margin-top:3px}
+  .datos-extra{margin-top:10px;font-size:14px}
+  .datos-extra div{padding:3px 0;border-bottom:1px dashed var(--linea)}
+  .datos-extra div:last-child{border-bottom:0}
+  .datos-extra b{font-weight:800}
 
-  .tarjeta{
-    background:var(--blanco);border:1.5px solid var(--tinta);
-    border-radius:var(--radio);padding:22px;
-  }
-  .tarjeta .titulo-via{font-weight:800;font-size:19px;line-height:1.25}
-  .tarjeta .sub-lugar{color:var(--tinta-suave);font-size:14.5px;margin-top:3px}
-
-  /* Casillas de sobre postal: la firma visual de la app */
   .cp-casillas{display:flex;gap:7px;margin:20px 0 6px}
-  .cp-casillas .casilla{
-    width:52px;height:64px;
-    border:2px solid var(--tinta);border-radius:8px;
-    background:var(--papel);
-    display:flex;align-items:center;justify-content:center;
+  .casilla{width:52px;height:64px;border:2px solid var(--tinta);border-radius:8px;
+    background:var(--papel);display:flex;align-items:center;justify-content:center;
     font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;
-    opacity:0;transform:translateY(6px);
-  }
-  .cp-casillas .casilla.llena{animation:aparecer .28s ease forwards}
+    opacity:0;transform:translateY(6px)}
+  .casilla.llena{animation:aparecer .28s ease forwards}
   @keyframes aparecer{to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){
-    .cp-casillas .casilla{opacity:1;transform:none}
-    .cp-casillas .casilla.llena{animation:none}
-    #btnMic.escuchando{animation:none}
-  }
+    .casilla{opacity:1;transform:none}.casilla.llena{animation:none}
+    #btnMic.escuchando{animation:none}}
   .cp-nota{font-size:12.5px;color:var(--tinta-suave)}
 
-  .aviso-multi{
-    margin-top:16px;padding:12px 14px;border-radius:10px;
-    background:#FFF7D6;border:1.5px dashed var(--tinta);
-    font-size:13.5px;
-  }
-  .aviso-multi b{font-weight:800}
+  /* Tramos por portal */
+  .tramos{margin-top:16px;padding:14px;border-radius:10px;background:#FFF7D6;
+    border:1.5px dashed var(--tinta);font-size:13.5px}
+  .tramos h3{font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+  .tramos table{width:100%;border-collapse:collapse;font-size:13.5px}
+  .tramos td{padding:4px 6px;border-bottom:1px solid rgba(28,27,24,.15)}
+  .tramos tr:last-child td{border-bottom:0}
+  .tramos .t-cp{font-family:'IBM Plex Mono',monospace;font-weight:600;text-align:right}
+  .tramos .nota{margin-top:8px;font-size:11.5px;color:var(--tinta-suave)}
 
   .portal-zona{margin-top:16px;padding-top:16px;border-top:1px solid var(--linea)}
   .portal-zona label{font-size:13px;font-weight:700;display:block;margin-bottom:6px}
   .portal-fila{display:flex;gap:8px}
-  .portal-fila input{
-    width:110px;border:1.5px solid var(--tinta);border-radius:10px;
-    padding:9px 12px;font:inherit;font-size:15px;background:var(--blanco);
-  }
-  .portal-fila button{
-    border:1.5px solid var(--tinta);background:var(--tinta);color:var(--blanco);
-    border-radius:10px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer;
-  }
+  .portal-fila input{width:110px;border:1.5px solid var(--tinta);border-radius:10px;
+    padding:9px 12px;font:inherit;font-size:15px;background:var(--blanco)}
+  .portal-fila button{border:1.5px solid var(--tinta);background:var(--tinta);color:var(--blanco);
+    border-radius:10px;padding:9px 16px;font:inherit;font-weight:700;cursor:pointer}
   .portal-fila button:hover{background:#000}
   .portal-res{margin-top:10px;font-size:14px}
   .portal-res .exacto{color:var(--azul);font-weight:700}
   .portal-res .ajustado{color:#8A6A00;font-weight:700}
 
-  #mapa{
-    min-height:340px;border:1.5px solid var(--tinta);
-    border-radius:var(--radio);overflow:hidden;
-  }
+  #mapa{min-height:360px;border:1.5px solid var(--tinta);border-radius:var(--radio);overflow:hidden}
   .popup-cp{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;text-align:center}
   .popup-via{font-family:'Archivo',sans-serif;font-size:12px;text-align:center;margin-top:2px}
 
-  footer{
-    margin-top:44px;padding-top:16px;border-top:1px solid var(--linea);
-    font-size:12.5px;color:var(--tinta-suave);
-  }
+  footer{margin-top:44px;padding-top:16px;border-top:1px solid var(--linea);
+    font-size:12.5px;color:var(--tinta-suave)}
   footer a{color:var(--azul)}
 </style>
 </head>
@@ -196,7 +163,7 @@
   <div class="caja-busqueda">
     <div class="campo">
       <input id="entrada" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Calle Santo Domingo de Guzmán… o un CP: 28013"
+             placeholder="Calle Santo Domingo de Guzmán… o un CP: 48340"
              aria-label="Calle o código postal">
       <button id="btnMic" class="boton" title="Dictar por voz" aria-label="Dictar por voz">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/></svg>
@@ -206,6 +173,15 @@
       </button>
     </div>
     <div id="listaCandidatos" class="lista" hidden></div>
+
+    <div class="barra-geo">
+      <button id="btnGeo" type="button" aria-pressed="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.1-7-11a7 7 0 1 1 14 0c0 4.9-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+        Ordenar por cercanía
+      </button>
+      <span id="geoInfo"></span>
+    </div>
+
     <p class="ayuda">Datos oficiales de <b>CartoCiudad</b> (IGN). Si una calle existe en varias localidades, te mostraré la lista para que elijas.</p>
   </div>
 
@@ -215,17 +191,15 @@
     <div class="tarjeta">
       <div class="titulo-via" id="resVia"></div>
       <div class="sub-lugar" id="resLugar"></div>
+      <div class="datos-extra" id="datosExtra" hidden></div>
 
       <div class="cp-casillas" id="cpCasillas" aria-label="Código postal"></div>
       <p class="cp-nota" id="cpNota"></p>
 
-      <div class="aviso-multi" id="avisoMulti" hidden>
-        ⚠️ <b>Atención:</b> esta calle tiene <b>más de un código postal</b> según el número de portal.
-        Indica el portal para obtener el código exacto.
-      </div>
+      <div class="tramos" id="tramos" hidden></div>
 
       <div class="portal-zona" id="portalZona" hidden>
-        <label for="portalNum">Afinar por número de portal (opcional)</label>
+        <label for="portalNum">Comprobar un portal concreto (opcional)</label>
         <div class="portal-fila">
           <input id="portalNum" type="number" min="1" inputmode="numeric" placeholder="Nº">
           <button id="btnPortal">Comprobar</button>
@@ -239,7 +213,8 @@
 
   <footer>
     Fuente de datos: servicio Geocoder de <a href="https://www.cartociudad.es" target="_blank" rel="noopener">CartoCiudad</a>
-    (CNIG/IGN, licencia CC BY 4.0, con datos de Catastro, INE y Correos). Herramienta no oficial, sin afiliación con Correos.
+    (CNIG/IGN, licencia CC BY 4.0, con datos de Catastro, INE y Correos). Población orientativa vía Wikidata.
+    Herramienta no oficial, sin afiliación con Correos.
   </footer>
 </div>
 
@@ -248,9 +223,20 @@
 "use strict";
 
 /* =====================================================================
-   1) CAPA DE RED — JSONP contra CartoCiudad
-   El servicio ofrece endpoints *Jsonp que inyectan la respuesta en un
-   callback global: así evitamos cualquier problema de CORS sin backend.
+   0) CONFIGURACIÓN — edita aquí tu zona para los tags de color
+   ===================================================================== */
+const ZONA = {
+  municipio: ["bilbao"],                 // tag rojo
+  etiquetaMunicipio: "Bilbao",
+  provincia: ["bizkaia", "vizcaya"],     // tag azul
+  etiquetaProvincia: "Vizcaya",
+  etiquetaResto: "Nacional"              // tag verde
+};
+const MAX_SIN_SCROLL = 8;   // hasta cuántos resultados se muestran sin scroll
+const MUESTRAS_TRAMO = 7;   // portales sondeados por paridad al calcular tramos
+
+/* =====================================================================
+   1) CAPA DE RED — JSONP contra CartoCiudad (evita CORS sin backend)
    ===================================================================== */
 const BASE = "https://www.cartociudad.es/geocoder/api/geocoder/";
 
@@ -260,40 +246,40 @@ function jsonp(endpoint, params){
     let terminado = false;
     const limpiar = () => { delete window[cb]; script.remove(); };
     window[cb] = (data) => { terminado = true; resolve(data); limpiar(); };
-
     const qs = Object.entries({ ...params, callback: cb })
       .map(([k, v]) => `${k}=${encodeURIComponent(v)}`).join("&");
-
     const script = document.createElement("script");
     script.src = BASE + endpoint + "?" + qs;
     script.onerror = () => { if (!terminado) { reject(new Error("red")); limpiar(); } };
     document.head.appendChild(script);
-
-    setTimeout(() => { if (!terminado) { reject(new Error("timeout")); limpiar(); } }, 10000);
+    setTimeout(() => { if (!terminado) { reject(new Error("timeout")); limpiar(); } }, 12000);
   });
 }
-
 const apiCandidatos = (q, limit = 12) =>
   jsonp("candidatesJsonp", { q, limit, countrycodes: "es", autocancel: "true" });
-
 const apiFind = (q) => jsonp("findJsonp", { q });
+const apiReverse = (lon, lat) => jsonp("reverseGeocode", { lon, lat });
 
 /* =====================================================================
-   2) REFERENCIAS AL DOM Y ESTADO
+   2) DOM Y ESTADO
    ===================================================================== */
 const $ = (id) => document.getElementById(id);
 const entrada = $("entrada"), lista = $("listaCandidatos"), estado = $("estado");
 const resultado = $("resultado"), resVia = $("resVia"), resLugar = $("resLugar");
-const cpCasillas = $("cpCasillas"), cpNota = $("cpNota");
-const avisoMulti = $("avisoMulti"), portalZona = $("portalZona");
+const datosExtra = $("datosExtra"), cpCasillas = $("cpCasillas"), cpNota = $("cpNota");
+const tramosEl = $("tramos"), portalZona = $("portalZona");
 const portalNum = $("portalNum"), portalRes = $("portalRes");
+const btnGeo = $("btnGeo"), geoInfo = $("geoInfo");
 
-let seleccion = null;        // candidato elegido
-let mapa = null, marcador = null;
-let temporizador = null;     // debounce
+let seleccion = null;
+let mapa = null, marcador = null, capaPoligono = null;
+let temporizador = null;
+let posUsuario = null;          // {lat, lng}
+let zonaUsuario = null;         // {muni, provincia} vía reverseGeocode
+let idTramos = 0;               // token para cancelar cálculos de tramos obsoletos
 
 /* =====================================================================
-   3) UTILIDADES DE UI
+   3) UTILIDADES
    ===================================================================== */
 function ponEstado(msg, opts = {}){
   estado.textContent = msg || "";
@@ -303,12 +289,42 @@ function esconderLista(){ lista.hidden = true; lista.innerHTML = ""; }
 function capitaliza(s){
   return (s || "").toLowerCase().replace(/(^|[\s/(.-])([a-záéíóúüñ])/g, (m, p, c) => p + c.toUpperCase());
 }
+/* CartoCiudad a veces incluye el tipo de vía dentro de address: no duplicar */
 function nombreVia(c){
-  const tipo = c.tip_via ? capitaliza(c.tip_via) + " " : "";
-  return tipo + capitaliza(c.address);
+  const dir = capitaliza(c.address);
+  const tipo = capitaliza(c.tip_via || "");
+  return (tipo && !dir.toLowerCase().startsWith(tipo.toLowerCase())) ? `${tipo} ${dir}` : dir;
+}
+function lugarDe(c){
+  return [capitaliza(c.muni), capitaliza(c.province)]
+    .filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(" · ");
+}
+/* Distancia Haversine en km */
+function distanciaKm(a, b){
+  const R = 6371, rad = (x) => x * Math.PI / 180;
+  const dLat = rad(b.lat - a.lat), dLng = rad(b.lng - a.lng);
+  const h = Math.sin(dLat/2)**2 +
+            Math.cos(rad(a.lat)) * Math.cos(rad(b.lat)) * Math.sin(dLng/2)**2;
+  return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-/* Casillas de sobre: pinta el CP dígito a dígito */
+/* Clasificación por zona: Bilbao → rojo · Vizcaya → azul · resto → verde */
+function tagZona(c){
+  const muni = (c.muni || "").toLowerCase();
+  const prov = (c.province || "").toLowerCase();
+  if (ZONA.municipio.includes(muni)) return { txt: ZONA.etiquetaMunicipio, clase: "zona-rojo" };
+  if (ZONA.provincia.some(p => prov.includes(p))) return { txt: ZONA.etiquetaProvincia, clase: "zona-azul" };
+  return { txt: ZONA.etiquetaResto, clase: "zona-verde" };
+}
+/* Tag de tipo: Calle/Avenida/Barrio…, Población, Municipio, CP */
+function tagTipo(c){
+  if (c.type === "Codpost")   return { txt: "Código postal", clase: "tipo" };
+  if (c.type === "poblacion") return { txt: "Población", clase: "tipo-pob" };
+  if (c.type === "municipio") return { txt: "Municipio", clase: "tipo-pob" };
+  const via = capitaliza(c.tip_via || "") || "Vía";
+  return { txt: via, clase: "tipo" };
+}
+
 function pintaCP(cp){
   cpCasillas.innerHTML = "";
   const digitos = (cp && /^\d{5}$/.test(cp)) ? cp.split("") : ["·","·","·","·","·"];
@@ -322,28 +338,101 @@ function pintaCP(cp){
 }
 
 /* =====================================================================
-   4) MAPA (Leaflet + OpenStreetMap)
+   4) MAPA (Leaflet + OSM) — marcador y/o polígono de límites
    ===================================================================== */
-function muestraMapa(lat, lng, cp, via){
-  const cont = $("mapa");
+function aseguraMapa(lat, lng){
   if (!mapa){
-    mapa = L.map(cont, { scrollWheelZoom: false }).setView([lat, lng], 16);
+    mapa = L.map($("mapa"), { scrollWheelZoom: false }).setView([lat, lng], 15);
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(mapa);
-  } else {
-    mapa.flyTo([lat, lng], 16, { duration: .8 });
   }
-  if (marcador) marcador.remove();
+  setTimeout(() => mapa.invalidateSize(), 60);
+}
+function limpiaCapas(){
+  if (marcador){ marcador.remove(); marcador = null; }
+  if (capaPoligono){ capaPoligono.remove(); capaPoligono = null; }
+}
+function muestraPunto(lat, lng, cp, via){
+  aseguraMapa(lat, lng);
+  mapa.flyTo([lat, lng], 16, { duration: .8 });
   marcador = L.marker([lat, lng]).addTo(mapa)
     .bindPopup(`<div class="popup-cp">${cp || "—"}</div><div class="popup-via">${via}</div>`)
     .openPopup();
-  setTimeout(() => mapa.invalidateSize(), 60);
+}
+/* Parser mínimo de WKT POLYGON / MULTIPOLYGON → anillos [[lat,lng],…] */
+function parseWKT(wkt){
+  if (!wkt || !/POLYGON/i.test(wkt)) return null;
+  const anillos = [];
+  const re = /\(([^()]+)\)/g; let g;
+  while ((g = re.exec(wkt))){
+    const pts = g[1].split(",").map(p => {
+      const [x, y] = p.trim().split(/\s+/).map(Number);
+      return [y, x]; // WKT es lon lat → Leaflet quiere lat lng
+    }).filter(p => Number.isFinite(p[0]) && Number.isFinite(p[1]));
+    if (pts.length > 3) anillos.push(pts);
+  }
+  return anillos.length ? anillos : null;
+}
+function dibujaPoligono(anillos){
+  const capas = anillos.map(a =>
+    L.polygon(a, { color: "#1C1B18", weight: 2, fillColor: "#FFCC00", fillOpacity: .22 }));
+  capaPoligono = L.featureGroup(capas).addTo(mapa);
+  mapa.fitBounds(capaPoligono.getBounds(), { padding: [24, 24] });
 }
 
 /* =====================================================================
-   5) BÚSQUEDA DE CANDIDATOS (autocompletar con debounce de 300 ms)
+   5) GEOLOCALIZACIÓN — ordenar resultados por cercanía
+   ===================================================================== */
+btnGeo.addEventListener("click", () => {
+  if (posUsuario){ // desactivar
+    posUsuario = null; zonaUsuario = null;
+    btnGeo.classList.remove("activo");
+    btnGeo.setAttribute("aria-pressed", "false");
+    geoInfo.textContent = "";
+    return;
+  }
+  if (!navigator.geolocation){
+    geoInfo.textContent = "Tu navegador no permite geolocalización.";
+    return;
+  }
+  geoInfo.textContent = "Obteniendo ubicación…";
+  navigator.geolocation.getCurrentPosition(async (pos) => {
+    posUsuario = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+    btnGeo.classList.add("activo");
+    btnGeo.setAttribute("aria-pressed", "true");
+    try {
+      const r = await apiReverse(posUsuario.lng, posUsuario.lat);
+      zonaUsuario = { muni: (r && r.muni || "").toLowerCase(),
+                      provincia: (r && r.province || "").toLowerCase() };
+      geoInfo.textContent = "Cerca de: " + (capitaliza(r.muni) || "tu posición");
+    } catch (_) {
+      zonaUsuario = null;
+      geoInfo.textContent = "Ubicación activa (sin detalle de municipio).";
+    }
+  }, (err) => {
+    geoInfo.textContent = err.code === 1
+      ? "Permiso de ubicación denegado en el navegador."
+      : "No se pudo obtener la ubicación.";
+  }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+});
+
+/* Puntuación de cercanía: km reales si hay coordenadas;
+   si no, pseudo-distancia por municipio (3) / provincia (30) / resto (300) */
+function puntuaCercania(c){
+  if (posUsuario && c.lat != null && c.lng != null)
+    return distanciaKm(posUsuario, { lat: c.lat, lng: c.lng });
+  if (zonaUsuario){
+    const muni = (c.muni || "").toLowerCase(), prov = (c.province || "").toLowerCase();
+    if (muni && muni === zonaUsuario.muni) return 3;
+    if (prov && prov === zonaUsuario.provincia) return 30;
+  }
+  return 300;
+}
+
+/* =====================================================================
+   6) AUTOCOMPLETAR (debounce 300 ms)
    ===================================================================== */
 entrada.addEventListener("input", () => {
   clearTimeout(temporizador);
@@ -351,7 +440,6 @@ entrada.addEventListener("input", () => {
   if (q.length < 3){ esconderLista(); return; }
   temporizador = setTimeout(() => buscaCandidatos(q), 300);
 });
-
 entrada.addEventListener("keydown", (e) => {
   if (e.key === "Enter"){
     e.preventDefault();
@@ -361,10 +449,11 @@ entrada.addEventListener("keydown", (e) => {
   }
   if (e.key === "Escape") esconderLista();
 });
-
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".caja-busqueda")) esconderLista();
 });
+$("btnBuscar").addEventListener("click", () =>
+  buscaCandidatos(entrada.value.trim(), { autoSiUnico: true }));
 
 async function buscaCandidatos(q, opts = {}){
   if (!q) return;
@@ -372,43 +461,41 @@ async function buscaCandidatos(q, opts = {}){
   try {
     const datos = await apiCandidatos(q);
     const tiposUtiles = ["callejero", "portal", "Codpost", "poblacion", "municipio"];
-    const candidatos = (datos || []).filter(c => tiposUtiles.includes(c.type));
+    let candidatos = (datos || []).filter(c => tiposUtiles.includes(c.type));
 
     if (!candidatos.length){
       esconderLista();
       ponEstado("Sin resultados. Prueba con «tipo de vía + nombre» o añade la localidad (ej.: «Calle Mayor, Toledo»).", { error: true });
       return;
     }
-    if (opts.autoSiUnico && candidatos.length === 1){
-      eligeCandidato(candidatos[0]);
-      return;
-    }
+    if (posUsuario) candidatos.sort((a, b) => puntuaCercania(a) - puntuaCercania(b));
+
+    if (opts.autoSiUnico && candidatos.length === 1){ eligeCandidato(candidatos[0]); return; }
     pintaLista(candidatos);
-    const nStreets = candidatos.filter(c => c.type === "callejero").length;
-    ponEstado(nStreets > 1
-      ? `Esa vía existe en ${nStreets} localidades. Elige la correcta:`
+    const nCalles = candidatos.filter(c => c.type === "callejero").length;
+    ponEstado(nCalles > 1
+      ? `Esa vía existe en ${nCalles} localidades. Elige la correcta:`
       : `${candidatos.length} resultado(s). Elige uno:`);
-  } catch (err) {
+  } catch (_) {
     ponEstado("No he podido conectar con CartoCiudad. Revisa tu conexión e inténtalo de nuevo.", { error: true });
   }
 }
 
-const NOMBRE_TIPO = {
-  callejero: "Calle", portal: "Portal", Codpost: "Código postal",
-  poblacion: "Población", municipio: "Municipio"
-};
-
 function pintaLista(candidatos){
   lista.innerHTML = "";
+  lista.classList.toggle("con-scroll", candidatos.length > MAX_SIN_SCROLL);
   candidatos.forEach(c => {
     const b = document.createElement("button");
     b.type = "button";
-    const lugar = [capitaliza(c.muni), capitaliza(c.province)]
-      .filter(Boolean).filter((v, i, a) => a.indexOf(v) === i).join(" · ");
+    if (c.type === "poblacion" || c.type === "municipio") b.classList.add("es-poblacion");
+    const zona = tagZona(c), tipo = tagTipo(c);
+    const dist = (posUsuario && c.lat != null)
+      ? ` · <span class="dist">${distanciaKm(posUsuario, {lat:c.lat,lng:c.lng}).toFixed(1)} km</span>` : "";
     b.innerHTML =
       `<span class="via">${c.type === "Codpost" ? "CP " + c.address : nombreVia(c)}</span>` +
-      `<span class="etiqueta">${NOMBRE_TIPO[c.type] || c.type}</span>` +
-      `<div class="lugar">${lugar || "España"}</div>`;
+      `<span class="tag ${tipo.clase}">${tipo.txt}</span>` +
+      `<span class="tag ${zona.clase}">${zona.txt}</span>` +
+      `<div class="lugar">${lugarDe(c) || "España"}${dist}</div>`;
     b.addEventListener("click", () => eligeCandidato(c));
     lista.appendChild(b);
   });
@@ -416,140 +503,245 @@ function pintaLista(candidatos){
 }
 
 /* =====================================================================
-   6) SELECCIÓN DE UN CANDIDATO → find() PARA CP + COORDENADAS
+   7) SELECCIÓN → detalle, mapa y (si procede) tramos o ficha municipal
    ===================================================================== */
 async function eligeCandidato(c){
   esconderLista();
   seleccion = c;
+  idTramos++;                      // invalida cálculos de tramos anteriores
+  tramosEl.hidden = true; tramosEl.innerHTML = "";
+  datosExtra.hidden = true; datosExtra.innerHTML = "";
+  portalRes.textContent = ""; portalNum.value = "";
   ponEstado("Obteniendo detalle", { cargando: true });
 
-  // Texto de consulta para find(): nombre completo + municipio para desambiguar
   const consulta = c.type === "Codpost"
     ? c.address
-    : `${c.tip_via || ""} ${c.address}, ${c.muni || ""}, ${c.province || ""}`.trim();
+    : `${nombreVia(c)}, ${c.muni || ""}, ${c.province || ""}`;
 
   try {
     const d = await apiFind(consulta);
-    if (!d || d.lat == null){
-      // Sin geometría puntual: mostramos lo que sepamos sin mapa
-      muestraResultado(c, d || {}, null);
-      ponEstado("Este elemento no tiene coordenadas puntuales en CartoCiudad; muestro los datos disponibles.");
-      return;
+    resultado.classList.add("visible");
+    limpiaCapas();
+
+    if (c.type === "Codpost"){ await fichaCodigoPostal(c, d); }
+    else {
+      resVia.textContent = nombreVia(c);
+      resLugar.textContent = lugarDe(c);
+      pintaCP(d && d.postalCode);
+      cpNota.textContent = (d && d.postalCode)
+        ? "Código postal a nivel de vía."
+        : "Esta vía abarca varios códigos postales.";
+      portalZona.hidden = !(c.type === "callejero" || c.type === "portal");
+      if (d && d.lat != null) muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
+      ponEstado("");
+      if (c.type === "callejero") compruebaMultiCP(c, d && d.postalCode);
     }
-    muestraResultado(c, d, { lat: d.lat, lng: d.lng });
-    ponEstado("");
-    if (c.type === "callejero") compruebaMultiCP(c, d.postalCode);
-  } catch (err) {
+  } catch (_) {
     ponEstado("Error al obtener el detalle. Inténtalo de nuevo.", { error: true });
   }
 }
 
-function muestraResultado(c, d, coords){
-  resultado.classList.add("visible");
-  avisoMulti.hidden = true;
-  portalRes.textContent = "";
-  portalNum.value = "";
+/* ---------- Ficha de código postal: localidad + datos + límites ---------- */
+async function fichaCodigoPostal(c, d){
+  const muni = capitaliza((d && d.muni) || c.muni || "");
+  const prov = capitaliza((d && d.province) || c.province || "");
+  const pobl = capitaliza((d && d.poblacion) || c.poblacion || "");
 
-  if (c.type === "Codpost"){
-    // Búsqueda inversa: CP → localidad
-    resVia.textContent = "Código postal " + c.address;
-    resLugar.textContent = [capitaliza(d.poblacion || c.poblacion), capitaliza(d.muni || c.muni),
-      capitaliza(d.province || c.province)].filter(Boolean)
-      .filter((v, i, a) => a.indexOf(v) === i).join(" · ");
-    pintaCP(c.address);
-    cpNota.textContent = "Localidad correspondiente al código postal introducido.";
-    portalZona.hidden = true;
-  } else {
-    resVia.textContent = nombreVia(c);
-    resLugar.textContent = [capitaliza(c.muni), capitaliza(c.province)].filter(Boolean)
-      .filter((v, i, a) => a.indexOf(v) === i).join(" · ");
-    pintaCP(d.postalCode);
-    cpNota.textContent = d.postalCode
-      ? "Código postal a nivel de vía."
-      : "Esta vía abarca varios códigos postales: indica un portal para afinar.";
-    portalZona.hidden = (c.type !== "callejero" && c.type !== "portal");
+  resVia.textContent = muni || pobl || ("Código postal " + c.address);
+  resLugar.textContent = [pobl !== muni ? pobl : "", prov].filter(Boolean).join(" · ");
+  pintaCP(c.address);
+  cpNota.textContent = "Localidad correspondiente al código postal introducido.";
+  portalZona.hidden = true;
+
+  datosExtra.hidden = false;
+  datosExtra.innerHTML =
+    `<div><b>Provincia:</b> ${prov || "—"}</div>` +
+    `<div id="lineaHab"><b>Habitantes:</b> consultando…</div>`;
+
+  if (d && d.lat != null){
+    muestraPunto(d.lat, d.lng, c.address, muni || "CP " + c.address);
   }
+  ponEstado("Cargando límites del municipio", { cargando: true });
 
-  if (coords) muestraMapa(coords.lat, coords.lng, d.postalCode || c.address, resVia.textContent);
+  // Límites: primero probamos la geometría del propio CP; si no, la del municipio
+  let anillos = parseWKT(d && d.geom);
+  if (!anillos && muni){
+    try {
+      const dm = await apiFind(`${muni}, ${prov}`);
+      anillos = parseWKT(dm && dm.geom);
+      if (!anillos && dm && dm.lat != null && !marcador) muestraPunto(dm.lat, dm.lng, c.address, muni);
+    } catch (_) {}
+  }
+  if (anillos){ aseguraMapa(anillos[0][0][0], anillos[0][0][1]); dibujaPoligono(anillos); }
+  ponEstado(anillos ? "" : "CartoCiudad no devolvió el polígono de límites para este elemento.");
+
+  habitantesWikidata(muni || pobl).then(hab => {
+    const linea = $("lineaHab");
+    if (linea) linea.innerHTML = "<b>Habitantes:</b> " +
+      (hab ? `≈ ${hab.toLocaleString("es-ES")} <small>(Wikidata)</small>` : "sin dato");
+  });
+}
+
+/* Población orientativa vía Wikidata (API pública con CORS) */
+async function habitantesWikidata(nombre){
+  if (!nombre) return null;
+  try {
+    const buscar = await fetch("https://www.wikidata.org/w/api.php?action=wbsearchentities&format=json&language=es&type=item&origin=*&limit=1&search=" + encodeURIComponent(nombre));
+    const b = await buscar.json();
+    const id = b.search && b.search[0] && b.search[0].id;
+    if (!id) return null;
+    const ent = await fetch(`https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*&props=claims&ids=${id}`);
+    const e = await ent.json();
+    const claims = e.entities[id].claims.P1082;
+    if (!claims || !claims.length) return null;
+    const ultimo = claims[claims.length - 1];
+    return Math.round(Number(ultimo.mainsnak.datavalue.value.amount));
+  } catch (_) { return null; }
 }
 
 /* =====================================================================
-   7) DETECCIÓN DE CALLES CON VARIOS CP (sondas par/impar)
-   Lanzamos dos consultas de portal (nº 1 y nº 2). Si los CP difieren
-   entre sí o respecto al de la vía, avisamos al usuario.
+   8) TRAMOS PARES/IMPARES — sondeo + búsqueda binaria de fronteras
+   Truco: pedir el portal 99999 hace que el geocoder devuelva el portal
+   existente más cercano → conocemos el último portal de la calle.
    ===================================================================== */
-async function compruebaMultiCP(c, cpVia){
+async function portalCP(c, n){
   try {
-    const base = `${c.tip_via || ""} ${c.address}`.trim();
-    const [p1, p2] = await Promise.all([
-      apiFind(`${base} 1, ${c.muni}, ${c.province}`),
-      apiFind(`${base} 2, ${c.muni}, ${c.province}`)
-    ]);
-    const cps = new Set([cpVia, p1 && p1.postalCode, p2 && p2.postalCode].filter(Boolean));
-    if (cps.size > 1 || !cpVia){
-      avisoMulti.hidden = false;
-      portalZona.hidden = false;
-    }
-  } catch (_) { /* la sonda es opcional: si falla, no molestamos */ }
+    const d = await apiFind(`${nombreVia(c)} ${n}, ${c.muni}, ${c.province}`);
+    if (!d || !d.postalCode || d.portalNumber == null) return null;
+    return { pedido: n, real: d.portalNumber, cp: d.postalCode, lat: d.lat, lng: d.lng, state: d.state };
+  } catch (_) { return null; }
 }
 
-/* Consulta manual de un portal concreto */
+async function compruebaMultiCP(c, cpVia){
+  const token = idTramos;
+  const [p1, p2] = await Promise.all([portalCP(c, 1), portalCP(c, 2)]);
+  if (token !== idTramos) return;
+  const cps = new Set([cpVia, p1 && p1.cp, p2 && p2.cp].filter(Boolean));
+  const sospechaMulti = cps.size > 1 || !cpVia;
+  if (!sospechaMulti) return;
+
+  tramosEl.hidden = false;
+  tramosEl.innerHTML = "<h3>Códigos por tramo</h3><div>Calculando tramos pares e impares…</div>";
+  try {
+    const [impares, pares] = await Promise.all([
+      tramosParidad(c, 1, token),
+      tramosParidad(c, 2, token)
+    ]);
+    if (token !== idTramos) return;
+    pintaTramos(impares, pares);
+  } catch (_) {
+    if (token === idTramos)
+      tramosEl.innerHTML = "<h3>Códigos por tramo</h3><div>No se pudieron calcular los tramos. Usa el comprobador de portal manual.</div>";
+  }
+}
+
+/* Devuelve [{desde, hasta, cp}] para una paridad (1=impar, 2=par) */
+async function tramosParidad(c, paridad, token){
+  const tope = await portalCP(c, 99998 + (paridad === 1 ? 1 : 0));
+  if (!tope) return [];
+  let max = tope.real;
+  if (max % 2 !== paridad % 2) max -= 1;           // ajustar a la paridad
+  const min = paridad === 1 ? 1 : 2;
+  if (max < min) return [];
+
+  // Muestras equiespaciadas de la misma paridad
+  const nums = new Set([min, max]);
+  for (let i = 1; i < MUESTRAS_TRAMO - 1; i++){
+    let n = Math.round(min + (max - min) * i / (MUESTRAS_TRAMO - 1));
+    if (n % 2 !== paridad % 2) n += 1;
+    if (n >= min && n <= max) nums.add(n);
+  }
+  const orden = [...nums].sort((a, b) => a - b);
+  const sondas = await Promise.all(orden.map(n => portalCP(c, n)));
+  if (token !== idTramos) throw new Error("cancelado");
+  const puntos = sondas.filter(Boolean)
+    .map(s => ({ n: s.real % 2 === paridad % 2 ? s.real : s.pedido, cp: s.cp }))
+    .sort((a, b) => a.n - b.n);
+  if (!puntos.length) return [];
+
+  // Refinar fronteras entre muestras con CP distinto (búsqueda binaria)
+  const bordes = [];
+  for (let i = 0; i < puntos.length - 1; i++){
+    let a = puntos[i], b = puntos[i + 1];
+    if (a.cp === b.cp) continue;
+    let lo = a.n, hi = b.n, cpLo = a.cp;
+    for (let paso = 0; paso < 6 && hi - lo > 2; paso++){
+      let mid = Math.round((lo + hi) / 2);
+      if (mid % 2 !== paridad % 2) mid += 1;
+      if (mid <= lo || mid >= hi) break;
+      const s = await portalCP(c, mid);
+      if (token !== idTramos) throw new Error("cancelado");
+      if (s && s.cp === cpLo) lo = mid; else hi = mid;
+    }
+    bordes.push({ finTramo: lo, inicioSiguiente: hi });
+  }
+
+  // Construir tramos a partir de puntos + bordes refinados
+  const tramos = [];
+  let inicio = puntos[0].n, cpActual = puntos[0].cp;
+  for (const b of bordes){
+    tramos.push({ desde: inicio, hasta: b.finTramo, cp: cpActual });
+    inicio = b.inicioSiguiente;
+    const p = puntos.find(x => x.n >= b.inicioSiguiente);
+    cpActual = p ? p.cp : cpActual;
+  }
+  tramos.push({ desde: inicio, hasta: puntos[puntos.length - 1].n, cp: cpActual });
+  return tramos.filter(t => t.desde <= t.hasta);
+}
+
+function pintaTramos(impares, pares){
+  if (!impares.length && !pares.length){
+    tramosEl.innerHTML = "<h3>Códigos por tramo</h3><div>Esta vía no tiene portales registrados en CartoCiudad.</div>";
+    return;
+  }
+  const fila = (etiqueta, t) =>
+    `<tr><td>${etiqueta} ${t.desde}–${t.hasta}</td><td class="t-cp">${t.cp}</td></tr>`;
+  const filas =
+    impares.map(t => fila("Impares", t)).join("") +
+    pares.map(t => fila("Pares", t)).join("");
+  const unico = new Set([...impares, ...pares].map(t => t.cp)).size === 1;
+  tramosEl.innerHTML =
+    "<h3>Códigos por tramo</h3>" +
+    `<table>${filas}</table>` +
+    `<div class="nota">${unico
+      ? "Todos los portales sondeados comparten código postal."
+      : "Tramos estimados por sondeo de portales; las fronteras se afinan por bisección. Para un portal concreto, usa el comprobador."}</div>`;
+}
+
+/* ---------- Comprobador manual de portal ---------- */
 $("btnPortal").addEventListener("click", buscaPortal);
 portalNum.addEventListener("keydown", (e) => { if (e.key === "Enter") buscaPortal(); });
 
 async function buscaPortal(){
   if (!seleccion || !portalNum.value) return;
   portalRes.textContent = "Comprobando…";
-  const base = `${seleccion.tip_via || ""} ${seleccion.address}`.trim();
-  try {
-    const d = await apiFind(`${base} ${portalNum.value}, ${seleccion.muni}, ${seleccion.province}`);
-    if (!d || !d.postalCode){
-      portalRes.innerHTML = "No hay datos para ese portal.";
-      return;
-    }
-    // state=1 exacto · 2/3 ajustado al par/impar más cercano (según docs del Geocoder)
-    const exacto = d.state === 1;
-    portalRes.innerHTML = exacto
-      ? `Portal ${d.portalNumber}: CP <span class="exacto">${d.postalCode}</span> (resultado exacto)`
-      : `Portal ${portalNum.value}: CP <span class="ajustado">${d.postalCode}</span> — ${d.stateMsg || "ajustado al portal más próximo"} (nº ${d.portalNumber})`;
-    pintaCP(d.postalCode);
-    cpNota.textContent = `Código postal para el portal nº ${portalNum.value}.`;
-    if (d.lat != null) muestraMapa(d.lat, d.lng, d.postalCode, `${nombreVia(seleccion)}, ${portalNum.value}`);
-  } catch (_) {
-    portalRes.textContent = "Error de conexión al comprobar el portal.";
-  }
+  const s = await portalCP(seleccion, Number(portalNum.value));
+  if (!s){ portalRes.textContent = "No hay datos para ese portal."; return; }
+  const exacto = s.state === 1;
+  portalRes.innerHTML = exacto
+    ? `Portal ${s.real}: CP <span class="exacto">${s.cp}</span> (resultado exacto)`
+    : `Portal ${s.pedido}: CP <span class="ajustado">${s.cp}</span> — ajustado al portal más próximo (nº ${s.real})`;
+  pintaCP(s.cp);
+  cpNota.textContent = `Código postal para el portal nº ${s.pedido}.`;
+  if (s.lat != null){ limpiaCapas(); muestraPunto(s.lat, s.lng, s.cp, `${nombreVia(seleccion)}, ${s.pedido}`); }
 }
 
 /* =====================================================================
-   8) BOTONES PRINCIPALES
-   ===================================================================== */
-$("btnBuscar").addEventListener("click", () =>
-  buscaCandidatos(entrada.value.trim(), { autoSiUnico: true }));
-
-/* =====================================================================
-   9) ENTRADA POR VOZ (Web Speech API)
-   Requiere HTTPS y navegador compatible (Chrome, Edge, Safari).
-   Si no hay soporte, el botón desaparece.
+   9) ENTRADA POR VOZ (Web Speech API) — requiere HTTPS
    ===================================================================== */
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
 const btnMic = $("btnMic");
-
-if (!SR){
-  btnMic.remove();
-} else {
+if (!SR){ btnMic.remove(); }
+else {
   const rec = new SR();
-  rec.lang = "es-ES";
-  rec.interimResults = false;
-  rec.maxAlternatives = 1;
+  rec.lang = "es-ES"; rec.interimResults = false; rec.maxAlternatives = 1;
   let escuchando = false;
-
   btnMic.addEventListener("click", () => {
     if (escuchando){ rec.stop(); return; }
     try { rec.start(); } catch (_) {}
   });
   rec.onstart = () => {
-    escuchando = true;
-    btnMic.classList.add("escuchando");
+    escuchando = true; btnMic.classList.add("escuchando");
     ponEstado("Escuchando… di el nombre de la calle o el código postal.");
   };
   rec.onresult = (e) => {
@@ -562,11 +754,9 @@ if (!SR){
       ? "Micrófono bloqueado: permite el acceso en el navegador (requiere HTTPS)."
       : "No he entendido el audio, inténtalo de nuevo.", { error: true });
   };
-  rec.onend = () => {
-    escuchando = false;
-    btnMic.classList.remove("escuchando");
-  };
+  rec.onend = () => { escuchando = false; btnMic.classList.remove("escuchando"); };
 }
 </script>
 </body>
 </html>
+
