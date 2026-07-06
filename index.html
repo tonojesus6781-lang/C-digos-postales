@@ -309,6 +309,64 @@ async function tramosDeLocal(c){
   return { via: base.datos[porNucleo[0].clave], version: base.v };
 }
 
+/* ---- Nomenclátor oficial del Ayto. de Bilbao: fuente preferente en Bilbao ---- */
+const NOMENCLATOR_URL = "nomenclator-bilbao.json";
+let nomenclatorPromesa = null, indiceBilbao = null;
+
+function cargaNomenclator(){
+  if (!nomenclatorPromesa){
+    nomenclatorPromesa = fetch(NOMENCLATOR_URL)
+      .then(r => r.ok ? r.json() : null)
+      .then(base => {
+        if (base && base.vias){
+          indiceBilbao = Object.keys(base.vias).map(clave => ({ clave, ...separa(clave) }));
+        }
+        return base;
+      })
+      .catch(() => null);
+  }
+  return nomenclatorPromesa;
+}
+async function tramosNomenclator(c){
+  if ((c.muni || "").toLowerCase() !== "bilbao") return null;
+  const base = await cargaNomenclator();
+  if (!base || !indiceBilbao) return null;
+  const buscada = separa(nombreVia(c));
+  if (!buscada.nucleo) return null;
+  let hits = indiceBilbao.filter(v => v.nucleo === buscada.nucleo);
+  if (hits.length > 1 && buscada.tipos.size)
+    hits = hits.filter(v => [...buscada.tipos].some(t => v.tipos.has(t)));
+  if (hits.length !== 1) return null;
+  return { regs: base.vias[hits[0].clave], version: base.v };
+}
+
+/* ---- Búsqueda local de candidatos: todas las vías y municipios de Vizcaya ---- */
+function candidatosLocales(q){
+  const qn = normaliza(q);
+  if (qn.length < 3 || /^\d+$/.test(qn) || !indiceLocal) return [];
+  const tokens = qn.split(" ").filter(t => t.length > 2 && !PALABRAS_VACIAS.has(t));
+  if (!tokens.length) return [];
+  const res = [], munisVistos = new Set();
+  for (const muni of Object.keys(indiceLocal)){
+    // municipios que casan con la consulta
+    if (muni.includes(qn) && !munisVistos.has(muni)){
+      munisVistos.add(muni);
+      res.push({ type: "municipio", address: capitaliza(muni), muni: capitaliza(muni),
+                 province: "Bizkaia", _local: true });
+    }
+    // vías cuyo nombre contiene todos los tokens de la consulta
+    for (const v of indiceLocal[muni]){
+      const viaTxt = v.clave.split("|")[1];
+      if (tokens.every(t => viaTxt.includes(t))){
+        res.push({ type: "callejero", address: capitaliza(viaTxt), tip_via: "",
+                   muni: capitaliza(muni), province: "Bizkaia", _local: true });
+        if (res.length > 14) return res;
+      }
+    }
+  }
+  return res;
+}
+
 /* =====================================================================
    1) CAPA DE RED — JSONP contra CartoCiudad (evita CORS sin backend)
    ===================================================================== */
@@ -589,15 +647,27 @@ async function buscaCandidatos(q, opts = {}){
   if (!q) return;
   ponEstado("Buscando", { cargando: true });
   try {
-    // Al teclear: búsqueda simple. Al pulsar buscar/Enter (o si la simple
-    // no encuentra calles): búsqueda expandida con variantes de tipo de vía.
-    let datos = opts.expandir ? await candidatosExpandido(q) : await apiCandidatos(q);
+    // Lanzar en paralelo la API y la carga de datos locales
+    const [datosApi] = await Promise.all([
+      (opts.expandir ? candidatosExpandido(q) : apiCandidatos(q)).catch(() => []),
+      cargaTramosLocal(), cargaNomenclator()
+    ]);
+    let datos = datosApi;
     const tiposUtiles = ["callejero", "portal", "Codpost", "poblacion", "municipio"];
     let candidatos = (datos || []).filter(c => tiposUtiles.includes(c.type));
 
     if (!opts.expandir && !candidatos.some(c => c.type === "callejero") && !/^\d{5}$/.test(q)){
-      datos = await candidatosExpandido(q);
+      datos = await candidatosExpandido(q).catch(() => []);
       candidatos = (datos || []).filter(c => tiposUtiles.includes(c.type));
+    }
+
+    // Fusionar con el índice local de Vizcaya (dedupe por núcleo+municipio)
+    const yaVistos = new Set(candidatos.map(c =>
+      normaliza(c.muni) + "|" + separa(nombreVia(c)).nucleo));
+    for (const loc of candidatosLocales(q)){
+      const clave = normaliza(loc.muni) + "|" +
+        (loc.type === "municipio" ? "" : separa(loc.address).nucleo);
+      if (!yaVistos.has(clave)){ yaVistos.add(clave); candidatos.push(loc); }
     }
 
     if (!candidatos.length){
@@ -655,41 +725,55 @@ async function eligeCandidato(c){
     ? c.address
     : `${nombreVia(c)}, ${c.muni || ""}, ${c.province || ""}`;
 
-  try {
-    const d = await apiFind(consulta);
-    resultado.classList.add("visible");
-    limpiaCapas();
+  const d = await apiFind(consulta).catch(() => null);
+  resultado.classList.add("visible");
+  limpiaCapas();
 
-    if (c.type === "Codpost"){ await fichaCodigoPostal(c, d); }
-    else {
-      resVia.textContent = nombreVia(c);
-      resLugar.textContent = lugarDe(c);
-      pintaCP(d && d.postalCode);
-      cpNota.textContent = (d && d.postalCode)
-        ? "Código postal a nivel de vía."
-        : "Esta vía abarca varios códigos postales.";
-      portalZona.hidden = !(c.type === "callejero" || c.type === "portal");
-      const geo = parseGeom(d && d.geom);
-      if (geo && geo.tipo === "linea"){
-        aseguraMapa(geo.partes[0][0][0], geo.partes[0][0][1]);
-        dibujaVia(geo.partes);                       // calle entera resaltada
-        if (d.lat != null) muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
-      } else if (d && d.lat != null){
-        muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
-      }
-      ponEstado("");
-      if (c.type === "callejero"){
-        const local = await tramosDeLocal(c);
-        if (local){
-          pintaTramosLocal(c, local, d && d.postalCode);
-        } else {
-          compruebaMultiCP(c, d && d.postalCode);
-        }
+  if (c.type === "Codpost"){ await fichaCodigoPostal(c, d || {}); }
+  else {
+    resVia.textContent = nombreVia(c);
+    resLugar.textContent = lugarDe(c);
+    pintaCP(d && d.postalCode);
+    cpNota.textContent = (d && d.postalCode)
+      ? "Código postal a nivel de vía."
+      : "Esta vía abarca varios códigos postales.";
+    portalZona.hidden = !(c.type === "callejero" || c.type === "portal");
+    const geo = parseGeom(d && d.geom);
+    if (geo && geo.tipo === "linea"){
+      aseguraMapa(geo.partes[0][0][0], geo.partes[0][0][1]);
+      dibujaVia(geo.partes);                       // calle entera resaltada
+      if (d.lat != null) muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
+    } else if (d && d.lat != null){
+      muestraPunto(d.lat, d.lng, d.postalCode, resVia.textContent);
+    }
+    ponEstado(d ? "" : "El geocoder no respondió: muestro los datos locales sin mapa.");
+    if (c.type === "callejero"){
+      const nom = await tramosNomenclator(c);      // 1º fuente oficial municipal
+      if (nom){
+        pintaTramosNomenclator(nom, d && d.postalCode);
+      } else {
+        const local = await tramosDeLocal(c);      // 2º GeoPackage provincial
+        if (local) pintaTramosLocal(c, local, d && d.postalCode);
+        else if (d) compruebaMultiCP(c, d.postalCode);   // 3º sondeo por API
       }
     }
-  } catch (_) {
-    ponEstado("Error al obtener el detalle. Inténtalo de nuevo.", { error: true });
   }
+}
+
+/* ---------- Tramos desde el Nomenclátor oficial de Bilbao ---------- */
+function pintaTramosNomenclator(nom, cpVia){
+  const cps = new Set(nom.regs.map(r => r.cp));
+  if (!cpVia && cps.size === 1){
+    pintaCP([...cps][0]);
+    cpNota.textContent = "Código postal oficial (Nomenclátor Ayto. Bilbao).";
+  }
+  tramosEl.hidden = false;
+  const filas = nom.regs.map(r =>
+    `<tr><td>${r.t}</td><td>${r.b || ""}</td><td class="t-cp">${r.cp}</td></tr>`).join("");
+  tramosEl.innerHTML =
+    "<h3>Códigos y portales de esta vía · dato oficial</h3>" +
+    `<table><tr><td><b>Portales</b></td><td><b>Barrio</b></td><td class="t-cp"><b>CP</b></td></tr>${filas}</table>` +
+    `<div class="nota">Nomenclátor de vías públicas del Ayuntamiento de Bilbao (edición ${nom.version}). "impares/pares/todos" indica a qué numeración aplica cada tramo.</div>`;
 }
 
 /* ---------- Ficha de código postal: localidad + datos + límites ---------- */
